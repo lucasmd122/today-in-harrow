@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate a one-item "Today in Harrow" RSS feed (weather + TfL status). Standard library only."""
+import re
 import json, urllib.request, html, datetime, email.utils, sys
 from zoneinfo import ZoneInfo
 from xml.sax.saxutils import escape
@@ -49,7 +50,9 @@ def tfl():
             parts = []
             for s in sts:
                 if s.get("reason"):
-                    parts.append(escape(s["reason"].strip()))
+                    r = re.sub(r"^\s*" + re.escape(line["name"]) + r"(\s+line)?\s*:\s*", "", s["reason"].strip(), flags=re.I)
+                    r = re.sub(r"^\s*" + re.escape(name) + r"(\s+line)?\s*:\s*", "", r, flags=re.I)
+                    parts.append(escape(r[:1].upper() + r[1:]))
                 else:
                     parts.append(escape(s["statusSeverityDescription"].capitalize()))
             rows.append(f"<b>{escape(name)}:</b> " + " ".join(dict.fromkeys(parts)))

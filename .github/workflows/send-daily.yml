@@ -1,0 +1,40 @@
+name: Send Harrow Online Daily
+on:
+  schedule:
+    - cron: "0 18 * * 0-4"   # Sun-Thu 18:00 UTC: prepares the next weekday's 09:00 London issue
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (safe), draft, or schedule"
+        type: choice
+        options: [dry-run, draft, schedule]
+        default: dry-run
+permissions:
+  contents: read
+concurrency: { group: send-daily, cancel-in-progress: false }
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Decide mode
+        id: m
+        env:
+          ENABLED: ${{ vars.DAILY_SEND_ENABLED }}
+          REQ: ${{ github.event_name == 'schedule' && 'schedule' || inputs.mode }}
+        run: |
+          if [ "$ENABLED" = "true" ]; then MODE="$REQ"; else MODE="dry-run"; echo "DAILY_SEND_ENABLED is not 'true': dry-run only."; fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+      - name: Run
+        env:
+          BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
+          BEEHIIV_TEST_SEGMENT_ID: ${{ vars.BEEHIIV_TEST_SEGMENT_ID }}
+          FULL_LIST: ${{ vars.DAILY_SEND_FULL_LIST }}
+          MODE: ${{ steps.m.outputs.mode }}
+        run: |
+          ARGS="--$MODE"
+          if [ "$FULL_LIST" = "true" ]; then ARGS="$ARGS --full-list"; fi
+          python send_daily.py $ARGS
