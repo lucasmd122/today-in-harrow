@@ -1,0 +1,25 @@
+name: Build Today in Harrow feed
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 5 * * 1-5"   # 05:30 UTC = 06:30 BST / 05:30 GMT
+    - cron: "30 6 * * 1-5"   # 06:30 UTC backup run
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: mkdir -p public && python generate_feed.py public/feed.xml
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: public }
+      - uses: actions/deploy-pages@v4
