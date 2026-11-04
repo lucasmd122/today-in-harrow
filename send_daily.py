@@ -245,6 +245,8 @@ def main():
     pid = (res.get("data") or {}).get("id")
     if not pid:
         fail("beehiiv did not return a post id.")
+    d = res.get("data") or {}
+    log(f"beehiiv returned: id={pid} title={d.get('title')!r} status={d.get('status')} web_url={d.get('web_url')} scheduled_at={d.get('scheduled_at')}")
     log(f"Created post {pid} as {status}" + (f", scheduled for {sched}" if status == "confirmed" else ""))
     return 0
 
