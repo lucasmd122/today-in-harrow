@@ -17,13 +17,16 @@ In this repo go to **Settings > Secrets and variables > Actions**:
 - To test with only your own address first, add `BEEHIIV_TEST_SEGMENT_ID` = the ID of a beehiiv segment that contains only you.
 - To send to the real list, delete `BEEHIIV_TEST_SEGMENT_ID` and add `DAILY_SEND_FULL_LIST` = `true`. Without one of these two, it will refuse to schedule.
 
+## The design
+Each issue is built from the saved beehiiv template **Harrow Online Daily - Design B**. To change the look, edit that template in beehiiv (Settings > Templates); the next issue picks it up. To use a different template, add a variable `BEEHIIV_POST_TEMPLATE_ID` with its ID.
+
 ## Turn it off
 Change `DAILY_SEND_ENABLED` to `false` (or delete it). Any issue already scheduled in beehiiv must be unscheduled in beehiiv itself.
 
 ## Test it
 **Actions** tab > **Send Harrow Online Daily** > **Run workflow**, pick:
 - `dry-run`: shows what it would create. Changes nothing.
-- `draft`: makes a draft in beehiiv to look at. Sends nothing.
+- `draft`: makes a draft in beehiiv to look at. Sends nothing, and works even while switched off. Use the optional title text box for test drafts so the real issue isn't blocked.
 - `schedule`: schedules the next weekday's 9am issue.
 
 It never creates the same day twice, skips weekends, and stops with an error if the news or events feeds are empty or out of date. If a run fails, GitHub emails the account owner.
