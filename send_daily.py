@@ -226,6 +226,8 @@ def main():
     g.add_argument("--draft", action="store_true", help="create the post as a draft only")
     g.add_argument("--schedule", action="store_true", help="create confirmed post scheduled for 09:00 London")
     ap.add_argument("--today", help="pretend today is YYYY-MM-DD (London), for testing")
+    ap.add_argument("--issue-date",
+                    help="override the issue date (YYYY-MM-DD). Skips next-weekday; for review drafts only")
     ap.add_argument("--full-list", action="store_true",
                     help="send to the whole list. Required for real scheduling without BEEHIIV_TEST_SEGMENT_ID")
     ap.add_argument("--skip-feed-check", action="store_true")
@@ -234,14 +236,18 @@ def main():
 
     now = dt.datetime.now(UTC)
     today = dt.date.fromisoformat(a.today) if a.today else now.astimezone(LONDON).date()
-    issue = next_weekday(today)
+    if a.issue_date:
+        issue = dt.date.fromisoformat(a.issue_date)
+    else:
+        issue = next_weekday(today)
     segment = os.environ.get("BEEHIIV_TEST_SEGMENT_ID", "").strip() or None
     full_list = a.full_list and not segment
 
     log(f"Mode: {mode}")
     log(f"Today (London): {today:%A %d %b %Y}. Issue date: {issue:%A %d %b %Y}")
 
-    if mode != "dry-run" and today.weekday() in (4, 5):
+    # Fri/Sat skip only applies to the automatic next-weekday path, not an explicit --issue-date.
+    if mode != "dry-run" and not a.issue_date and today.weekday() in (4, 5):
         log("Today is Friday or Saturday in London: Monday's issue is created by the Sunday run. Skipping.")
         return 0
     if mode == "schedule" and not segment and not full_list:

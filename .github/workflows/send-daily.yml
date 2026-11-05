@@ -13,6 +13,10 @@ on:
         description: "test only: text added to the title so it doesn't clash with a real issue"
         required: false
         default: ""
+      issue_date:
+        description: "optional YYYY-MM-DD issue date override (review drafts). Blank = next weekday"
+        required: false
+        default: ""
 permissions:
   contents: read
 concurrency: { group: send-daily, cancel-in-progress: false }
@@ -44,4 +48,5 @@ jobs:
         run: |
           ARGS="--$MODE"
           if [ "$FULL_LIST" = "true" ]; then ARGS="$ARGS --full-list"; fi
+          if [ -n "${{ inputs.issue_date }}" ]; then ARGS="$ARGS --issue-date ${{ inputs.issue_date }}"; fi
           python send_daily.py $ARGS
