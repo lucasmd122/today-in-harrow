@@ -1,7 +1,7 @@
 name: Send Harrow Online Daily
 on:
   schedule:
-    - cron: "0 18 * * 0-4"   # Sun-Thu 18:00 UTC: prepares the next weekday's 09:00 London issue
+    - cron: "0 18 * * *"     # every day 18:00 UTC: prepares tomorrow's 09:00 London issue
   workflow_dispatch:
     inputs:
       mode:
@@ -14,7 +14,7 @@ on:
         required: false
         default: ""
       issue_date:
-        description: "optional YYYY-MM-DD issue date override (review drafts). Blank = next weekday"
+        description: "optional YYYY-MM-DD issue date override (review drafts). Blank = tomorrow"
         required: false
         default: ""
 permissions:

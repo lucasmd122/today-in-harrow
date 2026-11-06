@@ -2,8 +2,8 @@
 
 Two jobs run here on GitHub:
 
-1. **Today in Harrow feed** (`generate_feed.py`): each weekday morning it builds a small feed with Harrow's weather and train status. Live at https://lucasmd122.github.io/today-in-harrow/feed.xml
-2. **Daily newsletter** (`send_daily.py`): every Sunday to Thursday at 6pm UK winter time (7pm summer time) it creates the next weekday's newsletter in beehiiv and schedules it for **9:00am London time**. News, What's On and the weather pull fresh at send time.
+1. **Today in Harrow feed** (`generate_feed.py`): each morning it builds a small feed with Harrow's weather and train status. Live at https://lucasmd122.github.io/today-in-harrow/feed.xml
+2. **Daily newsletter** (`send_daily.py`): every evening at 6pm UK winter time (7pm summer time) it creates tomorrow's newsletter in beehiiv and schedules it for **9:00am London time**, including weekends. News, What's On and the weather pull fresh at send time.
 
 A monthly "keep alive" job stops GitHub pausing the schedules.
 
@@ -27,6 +27,6 @@ Change `DAILY_SEND_ENABLED` to `false` (or delete it). Any issue already schedul
 **Actions** tab > **Send Harrow Online Daily** > **Run workflow**, pick:
 - `dry-run`: shows what it would create. Changes nothing.
 - `draft`: makes a draft in beehiiv to look at. Sends nothing, and works even while switched off. Use the optional title text box for test drafts so the real issue isn't blocked.
-- `schedule`: schedules the next weekday's 9am issue.
+- `schedule`: schedules tomorrow's 9am issue.
 
-It never creates the same day twice, skips weekends, and stops with an error if the news or events feeds are empty or out of date. If a run fails, GitHub emails the account owner.
+It never creates the same day twice, and stops with an error if the news or events feeds are empty or out of date. If a run fails, GitHub emails the account owner.
